@@ -1,5 +1,7 @@
 # 🛒 Amazong: The Chaos Store
 
+> **Live Website Demo:** [https://gorgeous-faun-aea149.netlify.app/]
+
 ---
 
 Welcome, brave soul. You have stumbled upon **Amazong: The Chaos Store**, an intentionally frustrating, psychologically exhausting online shopping game designed to test your patience, sanity, and endurance to the absolute limit. 
@@ -26,7 +28,7 @@ Forget quick and easy checkout. Here, every click is a struggle, prices mutate b
 
 ## 📌 How to View and Play This Project
 
-Because this project is built using **pure HTML, CSS, and Vanilla JavaScript** (with zero external frameworks, build tools, or complicated setups), running it is effortless:
+Because this project is built using **pure HTML, CSS, and Vanilla JavaScript** (with zero external frameworks, build tools, or complicated setups), running it locally is effortless:
 
 1. **Download the File:** Make sure your file is saved as **`index.html`**.
 2. **Open in Any Browser:** Double-click the `index.html` file, or drag and drop it into any web browser (Chrome, Edge, Firefox, etc.) to start playing instantly!
