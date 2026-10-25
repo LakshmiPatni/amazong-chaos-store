@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Amazong: The Chaos Store</title>
+<style>
+:root{--p:#ff2bd6;--g:#39ff14;--y:#ffe600;--c:#00e5ff;--bg:#07040f}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;min-height:100vh;background:var(--bg);color:#e8e8ff;font:15px/1.5 "Courier New",ui-monospace,monospace;background-image:linear-gradient(rgba(57,255,20,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(255,43,214,.08) 1px,transparent 1px);background-size:40px 40px}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:9999;background:repeating-linear-gradient(transparent 0 2px,rgba(0,0,0,.28) 2px 4px)}
+h1,h2,h3{margin:.4em 0;text-transform:uppercase}
+h2{color:var(--p);text-shadow:0 0 10px var(--p)}h3{color:var(--c)}
+.btn{font:inherit;color:var(--g);background:#0b1a0b;border:2px solid var(--g);padding:.5rem 1rem;cursor:pointer;text-transform:uppercase;text-shadow:0 0 6px var(--g);box-shadow:0 0 10px var(--g),inset 0 0 8px rgba(57,255,20,.3)}
+.btn:hover{background:var(--g);color:#000;text-shadow:none}
+.btn:disabled{opacity:.6;cursor:wait}
+input,textarea{font:inherit;width:100%;background:#0d0820;color:var(--y);border:2px solid var(--c);padding:.5rem;box-shadow:0 0 8px var(--c)}
+header{display:flex;gap:1rem;align-items:center;flex-wrap:wrap;padding:.7rem 1rem;background:#12052a;border-bottom:3px solid var(--p);box-shadow:0 0 18px var(--p);position:sticky;top:0;z-index:50}
+.logo{cursor:pointer;font-size:1.6rem;font-weight:bold;color:var(--p);text-shadow:0 0 10px var(--p),0 0 25px var(--p);animation:fl 3s infinite}
+.logo small{display:block;font-size:.6rem;color:var(--g);text-shadow:0 0 6px var(--g)}
+@keyframes fl{0%,92%,100%{opacity:1}94%{opacity:.4}96%{opacity:1}98%{opacity:.5}}
+#sf{flex:1;display:flex;gap:.5rem;min-width:220px}
+#cats{display:flex;gap:.6rem;justify-content:center;flex-wrap:wrap;padding:.6rem;background:#0c0418;border-bottom:1px solid var(--y)}
+#cats button{font:inherit;background:none;color:var(--y);border:1px solid var(--y);padding:.3rem .9rem;cursor:pointer;text-shadow:0 0 6px var(--y)}
+#cats .on{background:var(--y);color:#000;box-shadow:0 0 14px var(--y)}
+main{max-width:1100px;margin:0 auto;padding:1.2rem}
+#grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:1.2rem}
+.card{border:2px solid var(--p);padding:1rem;box-shadow:0 0 14px var(--p),inset 0 0 14px rgba(255,43,214,.2);background:#10061f;display:flex;flex-direction:column;gap:.4rem}
+.card h3{font-size:1rem}.card p{flex:1;margin:0}.ic{font-size:3rem;text-align:center}
+.pr{color:var(--y);font-size:1.3rem;text-shadow:0 0 8px var(--y)}
+#welcome{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1rem}
+.box{max-width:520px;text-align:center;border:3px solid var(--g);padding:2rem;box-shadow:0 0 25px var(--g);background:#08140a}
+.box h1{font-size:2.4rem;color:var(--p);text-shadow:0 0 12px var(--p),0 0 30px var(--p)}
+.f{margin:.6rem 0}.em,#cgm{color:#ff6b6b;display:block;min-height:1.2em}.wc{color:var(--g)}
+#cl{padding-left:1.2rem}#cl li{margin:.3rem 0}.rm{padding:0 .4rem;margin-left:.5rem}
+.bill{border:2px solid var(--y);padding:1rem;box-shadow:0 0 14px var(--y);font-size:1.05rem}
+#arena{position:relative;height:190px;margin-top:1rem;border:2px dashed var(--p)}
+#pay{position:absolute;left:calc(50% - 80px);top:70px;transition:left .15s,top .15s;font-size:1.1rem;color:var(--y);border-color:var(--y);box-shadow:0 0 16px var(--y)}
+#timer{position:fixed;right:12px;bottom:12px;z-index:4000;background:#0b0220;border:2px solid var(--g);padding:.6rem .9rem;box-shadow:0 0 16px var(--g);color:var(--g);font-size:.9rem}
+#timer b{font-size:1.4rem;color:var(--y);text-shadow:0 0 8px var(--y)}
+#modal{position:fixed;inset:0;background:rgba(0,0,0,.78);display:flex;align-items:center;justify-content:center;z-index:5000;padding:1rem}
+#modal>div{max-width:420px;background:#12052a;border:3px solid var(--y);padding:1.5rem;box-shadow:0 0 30px var(--y);text-align:center}
+#toast{position:fixed;left:50%;top:90px;transform:translate(-50%,-250%);transition:transform .3s;background:#2a0010;color:#ff8a8a;border:2px solid #ff3b3b;padding:.6rem 1rem;z-index:6000;box-shadow:0 0 16px #f33;max-width:90vw}
+#toast.on{transform:translate(-50%,0)}
+.dlg{position:fixed;z-index:5500;width:290px;max-width:92vw;background:#c0c0c0;color:#000;border:2px outset #fff;box-shadow:6px 6px 0 rgba(0,0,0,.6),0 0 18px var(--p);font:13px Arial,sans-serif;animation:sh .3s}
+@keyframes sh{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.tb{background:linear-gradient(90deg,#000080,#1084d0);color:#fff;padding:3px 6px;display:flex;justify-content:space-between;font-weight:bold}
+.tb b{background:#c0c0c0;color:#000;padding:0 6px;cursor:pointer}
+.dlg p{margin:.8rem;display:flex;gap:.6rem;align-items:center}
+.bt{display:flex;gap:.6rem;justify-content:center;padding-bottom:.8rem}
+.dlg button{min-width:75px;font:inherit;padding:2px 8px;cursor:pointer;background:#c0c0c0;border:2px outset #fff}
+#freeze{position:fixed;inset:0;z-index:7000;background:rgba(5,2,12,.7);backdrop-filter:grayscale(1) blur(2px);display:flex;align-items:center;justify-content:center;cursor:wait;text-align:center;padding:1rem}
+#freeze>div{background:#0b0220;border:3px solid var(--c);padding:1.5rem;box-shadow:0 0 30px var(--c);max-width:380px}
+.sp{width:56px;height:56px;margin:0 auto 1rem;border:6px solid #123;border-top-color:var(--p);border-radius:50%;animation:rot 1s linear infinite}
+@keyframes rot{to{transform:rotate(360deg)}}
+.bar{height:16px;border:2px solid var(--g);margin:.8rem 0}.bar i{display:block;width:99%;height:100%;background:var(--g);box-shadow:0 0 10px var(--g)}
+#cert{background:#fff8dc;color:#2a1a00;border:10px double #b8860b;padding:1.5rem;text-align:center;box-shadow:0 0 30px var(--y);-webkit-print-color-adjust:exact;print-color-adjust:exact}
+#cert h2{font-size:1.6rem;color:#8b0057;text-shadow:none}
+#cert h1{font-size:2.2rem;border-bottom:2px solid #b8860b;display:inline-block;padding:0 1rem;word-break:break-word;margin:.2em 0}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:.6rem;margin:1rem 0}
+.stats div{border:1px solid #b8860b;padding:.4rem}.stats b{display:block;font-size:1.3rem}
+.seal{width:120px;height:120px;margin:.5rem auto;border-radius:50%;background:radial-gradient(#ffe600,#d4a000);border:4px dashed #8b0057;display:flex;align-items:center;justify-content:center;text-align:center;font-weight:bold;font-size:.7rem;transform:rotate(-12deg);color:#5a0036}
+.act{text-align:center;margin:1.2rem 0;display:flex;gap:1rem;justify-content:center;flex-wrap:wrap}
+table{width:100%;border-collapse:collapse}th,td{border:1px solid var(--p);padding:.3rem .5rem;text-align:left}
+th{color:var(--y)}.me{background:rgba(255,230,0,.25);color:var(--y)}
+@media print{body *{visibility:hidden}#cert,#cert *{visibility:visible}#cert{position:absolute;left:0;top:0;width:100%}body::after{display:none}}
+</style>
+</head>
+<body>
+
+<section id="welcome">
+  <div class="box">
+    <h1>AMAZONG</h1>
+    <p style="color:var(--g)">The Chaos Store: where shopping is a lifestyle of suffering.</p>
+    <p>Before you enter, please type a <b>Nice Name</b>. It will be printed on your certificate and used against you.</p>
+    <form id="wf"><input id="nm" maxlength="24" placeholder="Type a Nice Name…" autocomplete="off"><br><br><button class="btn">Enter the Chaos</button></form>
+  </div>
+</section>
+
+<div id="top" hidden>
+  <header>
+    <div class="logo" id="logo">AMAZONG<small>the chaos store</small></div>
+    <form id="sf"><input id="q" placeholder="Search for things we definitely have…"><button class="btn">Search</button></form>
+    <button class="btn" id="cart">🛒 Cart: <span id="cc">0</span></button>
+  </header>
+  <nav id="cats">
+    <button data-c="all" class="on">✨ All</button><button data-c="el">📱 Electronics</button><button data-c="be">💄 Beauty</button><button data-c="ho">🏠 Home</button><button data-c="fa">👗 Fashion</button>
+  </nav>
+</div>
+
+<main id="store" hidden><div id="grid"></div></main>
+
+<main id="checkout" hidden>
+  <button class="btn" id="back">← Back to suffering</button>
+  <h2>Checkout Interrogation Chamber</h2>
+  <h3>1. Your Cart</h3><ul id="cl"></ul>
+  <h3>2. Shipping (Probably)</h3>
+  <div class="f"><input class="addr" placeholder="House / flat / hole in the wall"><small class="em"></small></div>
+  <div class="f"><input class="addr" placeholder="City (or vibes)"><small class="em"></small></div>
+  <div class="f"><input class="addr" placeholder="PIN code (lucky numbers only)"><small class="em"></small></div>
+  <h3>3. Academic Verification</h3>
+  <label>Enter your CGPA (0–10) for “verification”. Definitely not for pricing.</label>
+  <input id="cg" type="number" min="0" max="10" step="0.01" placeholder="e.g. 8.5"><small id="cgm"></small>
+  <h3>4. The Interrogation (₹100 per word)</h3>
+  <div class="f"><label>Q1. If a cart is empty in a forest, does it still owe shipping?</label><textarea class="q" rows="2"></textarea><small class="wc"></small></div>
+  <div class="f"><label>Q2. Describe the colour blue to a goldfish. Be persuasive.</label><textarea class="q" rows="2"></textarea><small class="wc"></small></div>
+  <div class="f"><label>Q3. Why do you deserve this purchase more than the next person?</label><textarea class="q" rows="2"></textarea><small class="wc"></small></div>
+  <div class="f"><label>Q4. On a scale of 1 to regret, how much regret? Explain in detail.</label><textarea class="q" rows="2"></textarea><small class="wc"></small></div>
+  <h3>5. Your Bill</h3><div class="bill" id="bl"></div>
+  <p><small>Hint: hovering over the pay button is optional. Persistence is not.</small></p>
+  <div id="arena"><button class="btn" id="pay">PAY NOW 💸</button></div>
+</main>
+
+<main id="victory" hidden>
+  <div id="cert">
+    <small>★ OFFICIAL DOCUMENT OF QUESTIONABLE VALUE ★</small>
+    <h2>Certificate of Psychological Endurance</h2>
+    <p>This certifies that</p><h1 id="cn"></h1>
+    <p>has survived <b>Amazong: The Chaos Store</b> and lived to tell the tale.</p>
+    <div class="stats" id="cs"></div>
+    <p id="rk"></p>
+    <div class="seal">★<br>SEAL OF<br>SUFFERING</div>
+    <small>Digitally signed by The Server Hamster™</small>
+  </div>
+  <div class="act"><button class="btn" id="pr">🖨 Print / Download</button><button class="btn" id="re">🔁 Relive the Pain</button></div>
+  <h2>🏆 Hall of Torture</h2>
+  <table><thead><tr><th>#</th><th>Name</th><th>Time</th><th>Clicks</th><th>Errors</th><th>Resilience</th></tr></thead><tbody id="lb"></tbody></table>
+</main>
+
+<div id="timer" hidden>⏱ <b id="tt">00:00</b><br>🖱 Clicks: <span id="tc">0</span><br>💥 Errors: <span id="te">0</span></div>
+<div id="modal" hidden><div><h3>⚠ System Notice</h3><p id="mt"></p><button class="btn" id="mc">Fine, I’m sorry</button></div></div>
+<div id="dlgs"></div>
+<div id="freeze" hidden><div><div class="sp"></div><h3 id="fm">Loading…</h3><div class="bar"><i></i></div><small>99% complete. Do not touch anything.</small><br><small id="rc"></small></div></div>
+<div id="toast"></div>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const P=[
+{n:"Smartphone (Unlocked, Emotionally Locked)",p:49999,c:"el",i:"📱",d:"Unlocks with your face, finger or PIN. Still can’t unlock your crush’s replies."},
+{n:"Wireless Earbuds (Wired)",p:2499,c:"el",i:"🎧",d:"100% wireless*. *Wire sold separately. Wire included. Wire attached."},
+{n:"USB Cable (Fits Never)",p:899,c:"el",i:"🔌",d:"Fits on the third flip. Which is also the fourth flip. Physics is crying."},
+{n:"Power Bank (Drains Your Phone)",p:1799,c:"el",i:"🔋",d:"Fully charged phones are boring. We bring you that thrilling 1% adrenaline."},
+{n:"Bluetooth Speaker (Mute Edition)",p:2199,c:"el",i:"🔊",d:"Immersive 360° silence. Your neighbours will adore you."},
+{n:"Smartwatch That Tells Yesterday",p:5999,c:"el",i:"⌚",d:"Always 24 hours late. Finally, a gadget that understands your punctuality."},
+{n:"Mouse With No Left Click",p:799,c:"el",i:"🖱️",d:"Right-click your way through life. Left-click is a premium feature."},
+{n:"Laptop Stand (Just a Book)",p:3499,c:"el",i:"💻",d:"It’s a book. A heavy one. Reading is optional, paying is not."},
+{n:"Invisible Lipstick",p:1299,c:"be",i:"💄",d:"Makes your lips look exactly like they do now, for only ₹1,299 per swipe."},
+{n:"Face Cream for Your Ego",p:749,c:"be",i:"🧴",d:"Clinically proven to reduce confidence by 40%. Side effect: humility."},
+{n:"Perfume: Eau de Wi-Fi Router",p:1899,c:"be",i:"🌸",d:"Smells like blinking lights and broken promises."},
+{n:"Shampoo for Bald People",p:649,c:"be",i:"🧼",d:"Zero hair, zero results, 100% lather. Wash away your hopes."},
+{n:"Mirror That Flatters Nobody",p:1499,c:"be",i:"🪞",d:"Brutally honest. Reflects exactly what you were afraid of."},
+{n:"Sunscreen SPF −5",p:899,c:"be",i:"☀️",d:"Gives you a free tan and a free story for the doctor."},
+{n:"Chair That Hates Your Posture",p:7499,c:"ho",i:"🪑",d:"Ergonomic in the sense that it hurts in new and creative ways."},
+{n:"Smart Lamp (Dumb Bulb)",p:3199,c:"ho",i:"💡",d:"Connects to Wi-Fi, then judges your life choices in the dark."},
+{n:"Doorbell That Rings Inside",p:1399,c:"ho",i:"🔔",d:"Now you can be disturbed by yourself. No visitors needed."},
+{n:"Self-Stirring Mug",p:1099,c:"ho",i:"☕",d:"Technically self-stirring. You are the self. Congratulations."},
+{n:"Umbrella With a Roof Hole",p:799,c:"ho",i:"☂️",d:"Natural ventilation for rainy days. Your hair has filed a complaint."},
+{n:"Weighted Blanket (40 kg)",p:6499,c:"ho",i:"🛏️",d:"Hugs you like a mother-in-law. You won’t move until Tuesday."},
+{n:"One Sock (Premium)",p:599,c:"fa",i:"🧦",d:"Sold individually because balance is a lie. Left or right? We won’t tell."},
+{n:"Jeans With Zero Pockets",p:2999,c:"fa",i:"👖",d:"Hold nothing. Fear nothing. Lose your keys everywhere."},
+{n:"Sunglasses for Night Only",p:1799,c:"fa",i:"🕶️",d:"You can’t see a thing. You look incredible not seeing it."},
+{n:"Left-Handed Right Glove",p:499,c:"fa",i:"🧤",d:"Fits nobody. Fits nowhere. Fits the brand perfectly."},
+{n:"Shoes That Squeak With Confidence",p:3799,c:"fa",i:"👟",d:"Announces your arrival everywhere. Libraries hate this one trick."}
+];
+const TX=["Add to Cart (4 clicks)","3 clicks left…","Still thinking?","One. More. Click.","Added! 🎉"],AC={};
+const M=["👁️ We detected your mouse moving. Please move it less enthusiastically.","🔆 Your screen brightness is 12% too high. We’ve filed a complaint with your monitor.","🖱️ Your cursor appears to be left-leaning. Please re-centre it.","🧠 Our AI sensed you thinking. Please stop; it’s affecting the servers.","📡 Your Wi-Fi is judging you. Please apologise to your router.","🪑 Your posture is bad. We’re not mad, just disappointed.","🔋 Your battery is fine. We just wanted to see your reaction."];
+const ED=[["Fatal Error: Success","Operation completed successfully, which was never supposed to happen."],["Cart.exe","Cart.exe has stopped working. It was tired."],["Error 0xBAD","Your internet is fine. Our server is simply ignoring you."],["Update Available","Please update your personality to v2.0. Restart required."],["Cookie Consent","We’ve eaten all your cookies. Accept or Decline? Both mean yes."],["Session Expired","Your session expired 4 minutes before it began."],["Low Memory","Your brain is at 98% capacity. Please delete a thought."],["Disk Space Low","Please delete 3 hobbies to continue."],["Mouse Not Found","Please move the mouse to continue. Then press OK."],["Virus Detected","Just kidding. We are the virus. Press OK to feel better."]];
+const SE=["Error 404: “%” not found. Neither is your sense of direction.","Server hamster fell off the wheel. Try again in 3–5 business years.","Search is on lunch break. Back never.","Error 418: I’m a teapot and I refuse to search for “%”.","No results for “%”. Did you mean: something else entirely?","The search bar is on a coffee break. It started in 2019."];
+const CE=["Added to your cart. Also added to a stranger’s cart. They are now your rival.","Out of stock. (You just bought the last one. Or did you?)","Cart error: your item has gone to a better place.","Price changed while you were reading this. Sorry (not sorry)."];
+const AE=["Address too real. Try a fictional one.","Street names must rhyme.","This address already lives somewhere else.","That PIN code is unlucky today.","Too many vowels in your city."];
+const DT=["Too slow!","Nope!","Missed me!","Try harder!","Nice try!","Almost…","Hehe!","Last one…"];
+const FM=["Buffering your patience…","Reticulating splines…","Downloading more RAM…","Consulting the hamster…","Loading the loading screen…","Rebooting the internet…"];
+const S={name:"",t0:0,clicks:0,errs:0,pops:0,fr:0,rc:0,frz:0,pf:0,cart:[],cat:"all",live:false,dodges:0,fin:0,total:0};
+const secs=()=>Math.floor((Date.now()-S.t0)/1000);
+const fmt=s=>String(s/60|0).padStart(2,"0")+":"+String(s%60).padStart(2,"0");
+const inr=n=>"₹"+Math.round(n).toLocaleString("en-IN");
+const esc=s=>String(s).replace(/[&<>"']/g,c=>"&#"+c.charCodeAt(0)+";");
+const rnd=a=>a[Math.random()*a.length|0];
+
+function tick(){$("#tt").textContent=fmt(S.live?secs():S.fin);$("#tc").textContent=S.clicks;$("#te").textContent=S.errs}
+function toast(m){const t=$("#toast");t.textContent="⚠ "+m;t.classList.add("on");clearTimeout(toast.h);toast.h=setTimeout(()=>t.classList.remove("on"),2800)}
+function err(m){S.errs++;tick();toast(m)}
+function show(v){["welcome","store","checkout","victory"].forEach(x=>$("#"+x).hidden=x!==v);$("#top").hidden=!(v=="store"||v=="checkout");scrollTo(0,0)}
+function cartUI(){$("#cc").textContent=S.cart.length}
+
+function render(){$("#grid").innerHTML=P.map((x,i)=>S.cat=="all"||x.c==S.cat?`<article class="card"><div class="ic">${x.i}</div><h3>${x.n}</h3><p>${x.d}</p><div class="pr">${inr(x.p)}</div><button class="btn add" data-i="${i}">${TX[AC[i]||0]}</button></article>`:"").join("")}
+
+$("#grid").onclick=e=>{const b=e.target.closest(".add");if(!b)return;const i=b.dataset.i,n=AC[i]=(AC[i]||0)+1;b.textContent=TX[n];
+ if(n==4){S.cart.push(+i);AC[i]=0;b.disabled=true;cartUI();setTimeout(()=>{b.disabled=false;b.textContent=TX[0]},1200);
+  const r=Math.random();if(r<.2)freeze(2500,"Adding to cart… 99%");else if(r<.45)err(rnd(CE))}};
+
+$("#cats").onclick=e=>{const b=e.target.closest("button");if(!b)return;let c=b.dataset.c;
+ if(Math.random()<.3){const w=rnd(["el","be","ho","fa"]);if(w!=c){c=w;err("Category swapped by mistake. We’re not sorry.")}}
+ S.cat=c;show("store");render();$$("#cats button").forEach(x=>x.classList.toggle("on",x.dataset.c==c))};
+
+$("#sf").onsubmit=e=>{e.preventDefault();err(rnd(SE).replace("%",$("#q").value.trim()||"nothing"))};
+$("#logo").onclick=()=>show("store");
+$("#cart").onclick=()=>{co();show("checkout")};
+$("#back").onclick=()=>show("store");
+
+function wc(t){return t.value.trim().split(/\s+/).filter(Boolean).length}
+function bill(){
+ const sub=S.cart.reduce((a,id)=>a+P[id].p,0),raw=$("#cg").value,g=parseFloat(raw),ok=g>=0&&g<=10,m=ok?1+g/10:1,w=$$(".q").reduce((a,t)=>a+wc(t),0);
+ S.total=sub*m+w*100;
+ $("#cgm").textContent=raw===""?"":!ok?"Out of range. Gifted or lying?":g>=9?"Brilliant. That’ll cost extra.":"Noted. Your brain has been priced.";
+ $$(".q").forEach((t,i)=>$$(".wc")[i].textContent=wc(t)+" words = "+inr(wc(t)*100));
+ $("#bl").innerHTML=`Subtotal: ${inr(sub)}<br>Intelligence Tax (×${m.toFixed(2)}): ${inr(sub*m-sub)}<br>Word-Count Tax (${w} words × ₹100): ${inr(w*100)}<hr><b>TOTAL: ${inr(S.total)}</b>`}
+function co(){
+ $("#cl").innerHTML=S.cart.length?S.cart.map((id,k)=>`<li>${P[id].i} ${P[id].n} — ${inr(P[id].p)} <button class="btn rm" data-k="${k}">✖</button></li>`).join(""):"<li>Your cart is emptier than your promises. Go add things first.</li>";
+ bill()}
+$("#cl").onclick=e=>{const b=e.target.closest(".rm");if(b){S.cart.splice(+b.dataset.k,1);cartUI();co()}};
+$("#checkout").addEventListener("input",bill);
+$$(".addr").forEach(a=>a.oninput=()=>{if(Math.random()<.3){const m=a.nextElementSibling;m.textContent="❌ "+rnd(AE);S.errs++;tick();setTimeout(()=>m.textContent="",2500)}});
+
+const pay=$("#pay");
+pay.onmouseenter=()=>{
+ if(S.dodges>=8){pay.textContent="FINE. I’M TIRED. CLICK ME.";return}
+ const a=$("#arena");S.dodges++;pay.textContent=DT[S.dodges-1];
+ pay.style.left=Math.random()*(a.clientWidth-pay.offsetWidth)+"px";
+ pay.style.top=Math.random()*(a.clientHeight-pay.offsetHeight)+"px"};
+pay.onclick=()=>{
+ if(!S.cart.length)return err("Cart empty. Like your wallet will be.");
+ if($$(".addr").some(a=>!a.value.trim()))return err("Address incomplete. Where do we send the disappointment?");
+ const g=parseFloat($("#cg").value);if(!(g>=0&&g<=10))return err("CGPA must be 0–10. Math is hard, we know.");
+ if($$(".q").some(t=>!t.value.trim()))return err("Answer all four questions. “Idk” still costs ₹100.");
+ if(!S.pf&&!S.frz){S.pf=1;freeze(4500,"Processing payment… 99%",finish);return}
+ finish()};
+
+function errBox(){
+ if($$(".dlg").length>3)return;
+ const a=rnd(ED),d=document.createElement("div");d.className="dlg";
+ d.style.left=5+Math.random()*55+"vw";d.style.top=15+Math.random()*55+"vh";
+ d.innerHTML=`<div class="tb"><span>${a[0]}</span><b class="x">✖</b></div><p><span style="font-size:1.8rem">❌</span><span>${a[1]}</span></p><div class="bt"><button class="ok">OK</button><button class="no">Cancel</button></div>`;
+ $("#dlgs").appendChild(d)}
+$("#dlgs").onclick=e=>{const t=e.target,d=t.closest(".dlg");if(!d)return;
+ if(t.matches(".x"))toast("The ✖ is decorative.");
+ else if(t.matches(".ok"))d.remove();
+ else if(t.matches(".no")){d.remove();if(Math.random()<.4){toast("Cancel failed successfully.");S.errs++;errBox()}}};
+
+function pop(){
+ if(S.live&&!S.frz){S.pops++;
+  if(Math.random()<.4&&$("#modal").hidden){$("#mt").textContent=rnd(M);$("#modal").hidden=false}
+  else{S.errs++;errBox()}tick()}
+ S.pt=setTimeout(pop,8000+Math.random()*7000)}
+$("#mc").onclick=()=>$("#modal").hidden=true;
+
+function freeze(ms,msg,cb){
+ if(S.frz)return;S.frz=1;S.fr++;S.rc=0;
+ if(document.activeElement)document.activeElement.blur();
+ $("#fm").textContent=msg||rnd(FM);$("#rc").textContent="";$("#freeze").hidden=false;
+ setTimeout(()=>{$("#freeze").hidden=true;S.frz=0;cb?cb():toast("Thank you for your patience. It was not appreciated.")},ms)}
+function frzLoop(){if(S.live)freeze(3000+Math.random()*3000);S.ft=setTimeout(frzLoop,22000+Math.random()*15000)}
+
+function finish(){
+ S.fin=secs();S.live=false;clearInterval(S.iv);clearTimeout(S.pt);clearTimeout(S.ft);
+ $("#modal").hidden=true;$("#dlgs").innerHTML="";tick();
+ const sc=S.fin+S.errs*15+S.clicks*2+S.pops*20+S.fr*30,e={n:S.name,s:S.fin,k:S.clicks,e:S.errs,sc,d:Date.now()};
+ let H=[];try{H=JSON.parse(localStorage.getItem("hot")||"[]")}catch(x){}
+ H.push(e);H.sort((a,b)=>b.sc-a.sc);H=H.slice(0,10);
+ try{localStorage.setItem("hot",JSON.stringify(H))}catch(x){}
+ $("#cn").textContent=S.name;
+ $("#rk").textContent="Rank: "+(sc>600?"Grand Master of Suffering":sc>300?"Seasoned Sufferer":"Reluctant Survivor");
+ $("#cs").innerHTML=[["⏱ Time survived",fmt(S.fin)],["🖱 Clicks",S.clicks],["💥 Errors",S.errs],["💬 Pop-ups",S.pops],["🥶 Freezes",S.fr],["💸 Total paid",inr(S.total)],["🏅 Resilience",sc]].map(a=>`<div>${a[0]}<b>${a[1]}</b></div>`).join("");
+ $("#lb").innerHTML=H.map((r,i)=>`<tr class="${r.d==e.d?"me":""}"><td>${i+1}</td><td>${esc(r.n)}</td><td>${fmt(r.s)}</td><td>${r.k}</td><td>${r.e}</td><td>${r.sc}</td></tr>`).join("");
+ show("victory")}
+
+$("#wf").onsubmit=e=>{e.preventDefault();S.name=$("#nm").value.trim();if(!S.name){$("#nm").placeholder="A name. Any name. Please.";return}
+ S.t0=Date.now();S.live=true;S.iv=setInterval(tick,500);$("#timer").hidden=false;show("store");render();tick();
+ S.pt=setTimeout(pop,7000);S.ft=setTimeout(frzLoop,18000)};
+document.addEventListener("click",()=>{if(S.live){S.clicks++;tick()}if(S.frz){S.rc++;$("#rc").textContent="Rage-clicks: "+S.rc}},true);
+$("#pr").onclick=()=>window.print();
+$("#re").onclick=()=>location.reload();
+</script>
+</body>
+</html>
